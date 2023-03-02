@@ -324,27 +324,84 @@ TEST_CASE("[Image] Modifying pixels of an image") {
 	}
 }
 
-TEST_CASE("[Image] Convert image") {
-	for (int format = Image::FORMAT_RF; format < Image::FORMAT_RGBE9995; format++) {
-		for (int new_format = Image::FORMAT_RF; new_format < Image::FORMAT_RGBE9995; new_format++) {
-			Ref<Image> image = memnew(Image(4, 4, false, (Image::Format)format));
-			image->convert((Image::Format)new_format);
-			String format_string = Image::format_names[(Image::Format)format];
-			String new_format_string = Image::format_names[(Image::Format)new_format];
-			format_string = "Error converting from " + format_string + " to " + new_format_string + ".";
-			CHECK_MESSAGE(image->get_format() == new_format, format_string);
+
+TEST_CASE("[Image] Custom mipmaps") {
+	Ref<Image> image = memnew(Image(100, 100, false, Image::FORMAT_RGBA8));
+
+	REQUIRE(!image->has_mipmaps());
+	image->generate_mipmaps();
+	REQUIRE(image->has_mipmaps());
+
+	const int mipmaps = image->get_mipmap_count() + 1;
+	REQUIRE(mipmaps == 7);
+
+	// Initialize reference mipmap data.
+	// Each byte is given value "mipmap_index * 5".
+
+	{
+		PackedByteArray data = image->get_data();
+		uint8_t *data_ptr = data.ptrw();
+
+		for (int mip = 0; mip < mipmaps; mip++) {
+			int mip_offset = 0;
+			int mip_size = 0;
+			image->get_mipmap_offset_and_size(mip, mip_offset, mip_size);
+
+			for (int i = 0; i < mip_size; i++) {
+				data_ptr[mip_offset + i] = mip * 5;
+			}
+		}
+		image->set_data(image->get_width(), image->get_height(), image->has_mipmaps(), image->get_format(), data);
+	}
+
+	// Byte format conversion.
+
+	for (int format = Image::FORMAT_L8; format <= Image::FORMAT_RGBA8; format++) {
+		Ref<Image> image_bytes = memnew(Image());
+		image_bytes->copy_internals_from(image);
+		image_bytes->convert((Image::Format)format);
+		REQUIRE(image_bytes->has_mipmaps());
+
+		PackedByteArray data = image_bytes->get_data();
+		const uint8_t *data_ptr = data.ptr();
+
+		for (int mip = 0; mip < mipmaps; mip++) {
+			int mip_offset = 0;
+			int mip_size = 0;
+			image_bytes->get_mipmap_offset_and_size(mip, mip_offset, mip_size);
+
+			for (int i = 0; i < mip_size; i++) {
+				if (data_ptr[mip_offset + i] != mip * 5) {
+					REQUIRE_MESSAGE(false, "Byte format conversion error.");
+				}
+			}
 		}
 	}
 
-	Ref<Image> image = memnew(Image(4, 4, false, Image::FORMAT_RGBA8));
-	PackedByteArray image_data = image->get_data();
-	image->convert((Image::Format)-1);
-	CHECK_MESSAGE(image->get_data() == image_data, "Image conversion to invalid type (-1) should not alter image.");
+	// Floating point format conversion.
 
-	Ref<Image> image2 = memnew(Image(4, 4, false, Image::FORMAT_RGBA8));
-	image_data = image2->get_data();
-	image2->convert((Image::Format)(Image::FORMAT_MAX + 1));
-	CHECK_MESSAGE(image2->get_data() == image_data, "Image conversion to invalid type (Image::FORMAT_MAX + 1) should not alter image.");
+	for (int format = Image::FORMAT_RF; format <= Image::FORMAT_RGBAF; format++) {
+		Ref<Image> image_rgbaf = memnew(Image());
+		image_rgbaf->copy_internals_from(image);
+		image_rgbaf->convert((Image::Format)format);
+		REQUIRE(image_rgbaf->has_mipmaps());
+
+		PackedByteArray data = image_rgbaf->get_data();
+		const uint8_t *data_ptr = data.ptr();
+
+		for (int mip = 0; mip < mipmaps; mip++) {
+			int mip_offset = 0;
+			int mip_size = 0;
+			image_rgbaf->get_mipmap_offset_and_size(mip, mip_offset, mip_size);
+
+			for (int i = 0; i < mip_size; i += 4) {
+				float value = *(float *)(data_ptr + mip_offset + i);
+				if (!Math::is_equal_approx(value * 255.0f, mip * 5)) {
+					REQUIRE_MESSAGE(false, "Floating point conversion error.");
+				}
+			}
+		}
+	}
 }
 
 } // namespace TestImage
