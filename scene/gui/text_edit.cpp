@@ -2982,24 +2982,7 @@ void TextEdit::_update_theme_item_cache() {
 	Control::_update_theme_item_cache();
 
 	theme_cache.base_scale = get_theme_default_base_scale();
-
-	/* Internal API for CodeEdit */
-	theme_cache.brace_mismatch_color = get_theme_color(SNAME("brace_mismatch_color"), SNAME("CodeEdit"));
-	theme_cache.code_folding_color = get_theme_color(SNAME("code_folding_color"), SNAME("CodeEdit"));
-	theme_cache.folded_eol_icon = get_theme_icon(SNAME("folded_eol_icon"), SNAME("CodeEdit"));
-
-	/* Search */
-	theme_cache.search_result_color = get_theme_color(SNAME("search_result_color"));
-	theme_cache.search_result_border_color = get_theme_color(SNAME("search_result_border_color"));
-
-	/* Caret */
-	theme_cache.caret_width = get_theme_constant(SNAME("caret_width"));
-	theme_cache.caret_color = get_theme_color(SNAME("caret_color"));
-	theme_cache.caret_background_color = get_theme_color(SNAME("caret_background_color"));
-
-	/* Selection */
-	theme_cache.font_selected_color = get_theme_color(SNAME("font_selected_color"));
-	theme_cache.selection_color = get_theme_color(SNAME("selection_color"));
+	theme_cache.folded_code_region_color = get_theme_color(SNAME("folded_code_region_color"), SNAME("CodeEdit"));
 	use_selected_font_color = theme_cache.font_selected_color != Color(0, 0, 0, 0);
 
 	/* Other visuals */
@@ -6493,6 +6476,50 @@ void TextEdit::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("gutter_clicked", PropertyInfo(Variant::INT, "line"), PropertyInfo(Variant::INT, "gutter")));
 	ADD_SIGNAL(MethodInfo("gutter_added"));
 	ADD_SIGNAL(MethodInfo("gutter_removed"));
+
+
+	/* Theme items */
+	/* Internal API for CodeEdit */
+	BIND_THEME_ITEM_EXT(Theme::DATA_TYPE_COLOR, TextEdit, brace_mismatch_color, "brace_mismatch_color", "CodeEdit");
+	BIND_THEME_ITEM_EXT(Theme::DATA_TYPE_COLOR, TextEdit, code_folding_color, "code_folding_color", "CodeEdit");
+	BIND_THEME_ITEM_EXT(Theme::DATA_TYPE_COLOR, TextEdit, folded_code_region_color, "folded_code_region_color", "CodeEdit");
+	BIND_THEME_ITEM_EXT(Theme::DATA_TYPE_ICON, TextEdit, folded_eol_icon, "folded_eol_icon", "CodeEdit");
+
+	/* Search */
+	BIND_THEME_ITEM(Theme::DATA_TYPE_COLOR, TextEdit, search_result_color);
+	BIND_THEME_ITEM(Theme::DATA_TYPE_COLOR, TextEdit, search_result_border_color);
+
+	/* Caret */
+	BIND_THEME_ITEM(Theme::DATA_TYPE_CONSTANT, TextEdit, caret_width);
+	BIND_THEME_ITEM(Theme::DATA_TYPE_COLOR, TextEdit, caret_color);
+	BIND_THEME_ITEM(Theme::DATA_TYPE_COLOR, TextEdit, caret_background_color);
+
+	/* Selection */
+	BIND_THEME_ITEM(Theme::DATA_TYPE_COLOR, TextEdit, font_selected_color);
+	BIND_THEME_ITEM(Theme::DATA_TYPE_COLOR, TextEdit, selection_color);
+
+	/* Other visuals */
+	BIND_THEME_ITEM_CUSTOM(Theme::DATA_TYPE_STYLEBOX, TextEdit, style_normal, "normal");
+	BIND_THEME_ITEM_CUSTOM(Theme::DATA_TYPE_STYLEBOX, TextEdit, style_focus, "focus");
+	BIND_THEME_ITEM_CUSTOM(Theme::DATA_TYPE_STYLEBOX, TextEdit, style_readonly, "read_only");
+
+	BIND_THEME_ITEM_CUSTOM(Theme::DATA_TYPE_ICON, TextEdit, tab_icon, "tab");
+	BIND_THEME_ITEM_CUSTOM(Theme::DATA_TYPE_ICON, TextEdit, space_icon, "space");
+
+	BIND_THEME_ITEM(Theme::DATA_TYPE_FONT, TextEdit, font);
+	BIND_THEME_ITEM(Theme::DATA_TYPE_FONT_SIZE, TextEdit, font_size);
+	BIND_THEME_ITEM(Theme::DATA_TYPE_COLOR, TextEdit, font_color);
+	BIND_THEME_ITEM(Theme::DATA_TYPE_COLOR, TextEdit, font_readonly_color);
+	BIND_THEME_ITEM(Theme::DATA_TYPE_COLOR, TextEdit, font_placeholder_color);
+
+	BIND_THEME_ITEM(Theme::DATA_TYPE_CONSTANT, TextEdit, outline_size);
+	BIND_THEME_ITEM_CUSTOM(Theme::DATA_TYPE_COLOR, TextEdit, outline_color, "font_outline_color");
+
+	BIND_THEME_ITEM(Theme::DATA_TYPE_CONSTANT, TextEdit, line_spacing);
+
+	BIND_THEME_ITEM(Theme::DATA_TYPE_COLOR, TextEdit, background_color);
+	BIND_THEME_ITEM(Theme::DATA_TYPE_COLOR, TextEdit, current_line_color);
+	BIND_THEME_ITEM(Theme::DATA_TYPE_COLOR, TextEdit, word_highlighted_color);
 
 	/* Settings. */
 	GLOBAL_DEF(PropertyInfo(Variant::FLOAT, "gui/timers/text_edit_idle_detect_sec", PROPERTY_HINT_RANGE, "0,10,0.01,or_greater"), 3);
