@@ -253,5 +253,5 @@ void ToneMapper::tonemapper(RD::DrawListID p_subpass_draw_list, RID p_source_col
 	RD::get_singleton()->draw_list_bind_index_array(p_subpass_draw_list, material_storage->get_quad_index_array());
 
 	RD::get_singleton()->draw_list_set_push_constant(p_subpass_draw_list, &tonemap.push_constant, sizeof(TonemapPushConstant));
-	RD::get_singleton()->draw_list_draw(p_subpass_draw_list, true);
+	RD::get_singleton()->draw_list_draw(p_subpass_draw_list, false, 1u, 3u);
 }
