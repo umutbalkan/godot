@@ -193,7 +193,7 @@ opts.Add(BoolVariable("vulkan", "Enable the vulkan rendering driver", True))
 opts.Add(BoolVariable("opengl3", "Enable the OpenGL/GLES3 rendering driver", True))
 opts.Add(BoolVariable("openxr", "Enable the OpenXR driver", True))
 opts.Add(BoolVariable("use_volk", "Use the volk library to load the Vulkan loader dynamically", True))
-opts.Add(BoolVariable("disable_exceptions", "Force disabling exception handling code", False))
+opts.Add(BoolVariable("disable_exceptions", "Force disabling exception handling code", True))
 opts.Add("custom_modules", "A list of comma-separated directory paths containing custom modules to build.", "")
 opts.Add(BoolVariable("custom_modules_recursive", "Detect custom modules recursively for each specified path.", True))
 
@@ -707,9 +707,9 @@ if selected_platform in platform_list:
         if env.msvc:
             env.Append(CPPDEFINES=[("_HAS_EXCEPTIONS", 0)])
         else:
-            env.Append(CXXFLAGS=["-fno-exceptions"])
+            env.Append(CCFLAGS=["-fno-exceptions"])
     elif env.msvc:
-        env.Append(CXXFLAGS=["/EHsc"])
+        env.Append(CCFLAGS=["/EHsc"])
 
     # Configure compiler warnings
     if env.msvc:  # MSVC
