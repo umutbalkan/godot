@@ -142,6 +142,7 @@ void GradientTexture1D::_update() {
 	}
 
 	emit_changed();
+	RS::get_singleton()->texture_set_path(texture, get_path());
 }
 
 void GradientTexture1D::set_width(int p_width) {
@@ -266,6 +267,7 @@ void GradientTexture2D::_update() {
 		texture = RS::get_singleton()->texture_2d_create(image);
 	}
 	emit_changed();
+	RS::get_singleton()->texture_set_path(texture, get_path());
 }
 
 float GradientTexture2D::_get_gradient_offset_at(int x, int y) const {
