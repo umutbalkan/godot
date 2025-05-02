@@ -546,7 +546,6 @@ private:
 		/* Internal API for CodeEdit */
 		Color brace_mismatch_color;
 		Color code_folding_color = Color(1, 1, 1);
-		Color folded_code_region_color = Color(1, 1, 1);
 		Ref<Texture2D> folded_eol_icon;
 
 		/* Search */
